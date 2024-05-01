@@ -208,7 +208,7 @@ def train(model, normalize, optim, criterion, train_loader, test_loader1):
 
             loss, logits = closure()
 
-            if not args.sam
+            if not args.sam:
                 optim.step()
             else:
                 optim.step(closure=closure)
