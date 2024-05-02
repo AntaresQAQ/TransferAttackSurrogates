@@ -1,5 +1,4 @@
 from torch.optim.optimizer import Optimizer
-import copy
 from copy import deepcopy
 import torch
 import numpy as np

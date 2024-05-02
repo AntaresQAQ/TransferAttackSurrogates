@@ -3,7 +3,6 @@ Adopted from:
 https://github.com/davda54/sam/blob/main/sam.py
 https://github.com/pytorch/contrib/blob/master/torchcontrib/optim/swa.py
 """
-import copy
 import warnings
 from typing import Any, Callable, Dict, Iterable, Optional, Union
 

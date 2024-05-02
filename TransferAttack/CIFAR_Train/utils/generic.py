@@ -1,14 +1,11 @@
 import pickle
 import os
 import random
-import sys
 import logging
 import numpy as np
-import pretrainedmodels
 import timm
 import torch
 import cv2
-import torchvision
 import torchvision.transforms as transforms
 from tqdm import tqdm
 

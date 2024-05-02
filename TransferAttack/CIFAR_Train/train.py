@@ -15,10 +15,7 @@ import utils
 from utils import LabelSmoothingLoss, AverageMeter,  seed_everything, WrapModel
 from utils.losses import CutMixCrossEntropyLoss
 from torch.nn.utils import parameters_to_vector
-from trade_loss import trades_loss
 from utils.imagenet_utils import get_dataset
-from utils import WASAM, MultipleSWAModels
-
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -85,6 +82,12 @@ def get_args():
                         help='set the type of metric norm in pgd')
     parser.add_argument('--cuda', type=int, default=0)
     parser.add_argument('--seed', type=int, default=42)
+    parser.add_argument('--swa', action='store')
+    parser.add_argument('--samemixup', action='store')
+    parser.add_argument('--wsam', action='store')
+    parser.add_argument('--setting-lr', action='store')
+    parser.add_argument('--remain-constant', action='store')
+    parser.add_argument('--constant', action='store')
     return parser.parse_args()
 
 
@@ -217,7 +220,7 @@ def train(model, normalize, optim, criterion, train_loader, test_loader1):
 
             if isinstance(criterion,utils.losses.CutMixCrossEntropyLoss):
                 y = torch.max(y.data, 1)[1]
-
+                
             acc = (predicted == y).sum().item() / y.size(0)
             acc_meter.update(acc)
             loss_meter.update(loss.item())
@@ -325,12 +328,9 @@ if __name__ == '__main__':
         assert args.dataset == 'tiny-imagenet'
         project_name ='TransferAttack-tiny'
 
-    try:
-        wandb.init(project=project_name, name=args.save_dir.split('/')[-1], entity='aisp2020')
-        wandb.config.update(args)
-        main(args)
-    except Exception as e:
-        print(e)
+    wandb.init(project=project_name, name=args.save_dir.split('/')[-1], entity='aisp2020')
+    wandb.config.update(args)
+    main(args)
 
 
 

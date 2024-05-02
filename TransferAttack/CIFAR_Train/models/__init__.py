@@ -18,4 +18,3 @@ from .dla_simple import *
 from .dla import *
 from .inceptionv4 import *
 from .inceptionv3 import *
-from .IFP import *
