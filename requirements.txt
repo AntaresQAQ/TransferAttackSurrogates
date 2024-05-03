@@ -6,4 +6,6 @@ torchattacks
 tqdm
 wandb
 numpy
+timm
+opencv-python
 git+https://github.com/facebookresearch/jacobian_regularizer
