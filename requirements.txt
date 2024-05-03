@@ -1,0 +1,9 @@
+
+torch
+torchvision
+torchaudio
+torchattacks
+tqdm
+wandb
+numpy
+git+https://github.com/facebookresearch/jacobian_regularizer
