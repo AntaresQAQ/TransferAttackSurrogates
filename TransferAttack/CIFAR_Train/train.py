@@ -88,6 +88,7 @@ def get_args():
     parser.add_argument('--setting-lr', action='store')
     parser.add_argument('--remain-constant', action='store')
     parser.add_argument('--constant', action='store')
+    parser.add_argument('--wandbentity', type=str, default='aisp2020')
     return parser.parse_args()
 
 
@@ -328,7 +329,7 @@ if __name__ == '__main__':
         assert args.dataset == 'tiny-imagenet'
         project_name ='TransferAttack-tiny'
 
-    wandb.init(project=project_name, name=args.save_dir.split('/')[-1], entity='aisp2020')
+    wandb.init(project=project_name, name=args.save_dir.split('/')[-1], entity=args.wandbentity)
     wandb.config.update(args)
     main(args)
 
