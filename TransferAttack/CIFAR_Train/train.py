@@ -88,7 +88,7 @@ def get_args():
     parser.add_argument('--setting-lr', action='store')
     parser.add_argument('--remain-constant', action='store')
     parser.add_argument('--constant', action='store')
-    parser.add_argument('--wandbentity', type=str, default='aisp2020')
+    parser.add_argument('--wandbentity', type=str, default='ache_he')
     return parser.parse_args()
 
 
