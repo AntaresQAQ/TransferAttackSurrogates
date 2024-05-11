@@ -295,7 +295,7 @@ def main(args):
             if args.wsam:
                 criterion = torch.nn.CrossEntropyLoss(reduction='none')
             else:
-                criterion = torch.nn.CrossEntropyLoss()
+                criterion = criterion()
     else:
         criterion = LabelSmoothingLoss(classes=100 if args.dataset == 'cifar100' else 10, smoothing=args.smoothing)
 
