@@ -517,7 +517,7 @@ def generic_init(args):
     return logger
 
 
-def evaluate(model, criterion, loader, cpu):
+def evaluate(model, criterion, loader, cpu, mps_device):
     acc = AverageMeter()
     loss = AverageMeter()
 
@@ -526,7 +526,11 @@ def evaluate(model, criterion, loader, cpu):
     pbar = tqdm(loader, total=len(loader), colour='green',position=2, leave=False)
 
     for x, y in pbar:
-        if not cpu: x, y = x.cuda(), y.cuda()
+        if not cpu: 
+            if mps_device:
+                x, y = x.to(mps_device), y.to(mps_device)
+            else: 
+                x, y = x.cuda(), y.cuda()
         with torch.no_grad():
             _y = model(x)
             ac = (_y.argmax(dim=1) == y).sum().item() / len(x)
@@ -538,13 +542,17 @@ def evaluate(model, criterion, loader, cpu):
     return acc.average(), loss.average()
 
 
-def robust_evaluate(model, criterion,  loader,  attacker, cpu):
+def robust_evaluate(model, criterion,  loader,  attacker, cpu, mps_device):
     acc = AverageMeter()
     loss = AverageMeter()
     model.eval()
     pbar = tqdm(loader, total=len(loader), colour='green',position=2, leave=False)
     for x, y in pbar:
-        if not cpu: x, y = x.cuda(), y.cuda()
+        if not cpu: 
+            if mps_device:
+                x, y = x.to(mps_device), y.to(mps_device)
+            else: 
+                x, y = x.cuda(), y.cuda()
         x = attacker(x, y)
         with torch.no_grad():
             _y = model(x)

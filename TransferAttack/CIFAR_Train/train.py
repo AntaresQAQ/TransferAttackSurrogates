@@ -89,6 +89,7 @@ def get_args():
     parser.add_argument('--remain-constant', action='store')
     parser.add_argument('--constant', action='store')
     parser.add_argument('--wandbentity', type=str, default='ache_he')
+    parser.add_argument('--mps', action='store_true')
     return parser.parse_args()
 
 
@@ -167,7 +168,11 @@ def train(model, normalize, optim, criterion, train_loader, test_loader1):
                               random_start=args.pgd_random_start)
         else:
             raise NotImplementedError
-
+        
+    if args.mps:
+        mps_device = torch.device('mps')
+    else:
+        mps_device = None
 
     for epoch in tqdm(range(args.epoch)):
         acc_meter = AverageMeter()
@@ -177,7 +182,10 @@ def train(model, normalize, optim, criterion, train_loader, test_loader1):
 
         for x, y in pbar:
             if not args.cpu:
-                x, y = x.cuda(), y.cuda()
+                if mps_device:
+                    x, y = x.to(mps_device), y.to(mps_device)
+                else:
+                    x, y = x.cuda(), y.cuda()
             optim.zero_grad()
             if args.robust:
                 model.eval()
@@ -229,9 +237,9 @@ def train(model, normalize, optim, criterion, train_loader, test_loader1):
             utils.add_log(log, 'acc', acc)
             utils.add_log(log, 'loss', loss.item())
 
-        test_acc, test_loss = utils.evaluate(wrap_model, torch.nn.CrossEntropyLoss(), test_loader1, args.cpu)
+        test_acc, test_loss = utils.evaluate(wrap_model, torch.nn.CrossEntropyLoss(), test_loader1, args.cpu, mps_device)
         if args.robust:
-            robust_acc, robust_loss = utils.robust_evaluate(wrap_model, criterion, test_loader1, attacker, args.cpu)
+            robust_acc, robust_loss = utils.robust_evaluate(wrap_model, criterion, test_loader1, attacker, args.cpu, mps_device)
             wandb.log({'RobustAcc/train': acc_meter.mean, 'RobustLoss/train': loss_meter.mean, 'CleanAcc/val': test_acc,
                        'CleanLoss': test_loss, 'RobustAcc/val': robust_acc, 'RobustLoss/val': robust_loss})
 
@@ -292,8 +300,13 @@ def main(args):
         criterion = LabelSmoothingLoss(classes=100 if args.dataset == 'cifar100' else 10, smoothing=args.smoothing)
 
     if not args.cpu:
-        model.cuda()
-        criterion = criterion.cuda()
+        if args.mps:
+            device = torch.device('mps')
+            model = model.to(device)
+            criterion = criterion.to(device)
+        else:
+            model.cuda()
+            criterion = criterion.cuda()
 
     optim = utils.get_optim(
         args.optim, model, args,
